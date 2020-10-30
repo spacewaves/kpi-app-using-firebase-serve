@@ -1,3 +1,43 @@
+thingsList = document.getElementById("myList");
+
+function renderCafe(doc) {
+  let li = document.createElement("LI");
+  let taskName = document.createElement("span");
+  let quantity = document.createElement("span");
+  let date = document.createElement("span");
+  let daysToDeadline = document.createElement("span");
+  li.setAttribute("data-id", doc.id);
+  taskName.textContent = doc.data().taskName;
+  quantity.textContent = doc.data().quantity;
+  date.textContent = doc.data().date;
+
+  var today = new Date();
+  daysToDeadline.textContent = Math.floor(
+    (new Date(doc.data().date).getTime() - today.getTime()) /
+      (1000 * 60 * 60 * 24)
+  );
+
+  console.log(taskName);
+  li.appendChild(taskName);
+  li.appendChild(quantity);
+  li.appendChild(date);
+  li.appendChild(daysToDeadline);
+
+  const formattedText = `${taskName} => ${quantity} by ${date} ||  ${daysToDeadline} days remaining `;
+  const textNode = document.createTextNode(formattedText);
+  console.log(textNode);
+  thingsList.appendChild(li);
+}
+
+const db = firebase.firestore();
+db.collection("things")
+  .get()
+  .then((snapshot) => {
+    snapshot.docs.forEach((doc) => {
+      renderCafe(doc);
+    });
+  });
+
 const myTasks = [
   {
     taskName: "contact clients",
@@ -15,6 +55,7 @@ const myTasks = [
     date: "10/11/11100",
   },
 ];
+
 const addTaskToServer = (task) => {
   // some code to add task
   myTasks.push(task);
@@ -49,28 +90,33 @@ const getInputFieldsValues = () => {
 const handleClick = () => {
   const { taskName, quantity, date } = getInputFieldsValues();
 
-  // POST task to server
-  addTaskToServer({ taskName, quantity, date });
-  let addedTasks = getMyTasks();
-  let lastTaskAdded = addedTasks[addedTasks.length - 1];
-  console.log(firebase);
-  updateUI(lastTaskAdded);
+  // // POST task to server
+  // addTaskToServer({ taskName, quantity, date });
+  // let addedTasks = getMyTasks();
+  // let lastTaskAdded = addedTasks[addedTasks.length - 1];
+
+  // updateUI(lastTaskAdded);
 
   const db = firebase.firestore();
 
-  const createThing = document.createElement("createThing");
-
-  const thingsList = document.getElementById("thingsList");
+  thingsList = document.getElementById("myList");
 
   let thingsRef;
-
+  let unsubscribe;
   thingsRef = db.collection("things");
-  console.log("yo");
 
   thingsRef.add({
     taskName: taskName,
     quantity: quantity,
     date: date,
+  });
+
+  unsubscribe = thingsRef.onSnapshot((querySnapshot) => {
+    const items = querySnapshot.docs.map((doc) => {
+      return `<li>${doc.data().taskName}</li>`;
+    });
+
+    thingsList.innerHTML = items.join("");
   });
 };
 

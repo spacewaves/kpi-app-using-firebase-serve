@@ -20,8 +20,10 @@ function renderCafe(doc) {
   const formattedText = `${taskName.innerHTML} => ${quantity.innerHTML} by ${date.innerHTML} ||  ${daysToDeadline.innerHTML} days remaining  `;
 
   let textNode = document.createTextNode(formattedText);
-  console.log(textNode);
-  thingsList.appendChild(textNode);
+
+  li.appendChild(textNode);
+  console.log(li);
+  thingsList.appendChild(li);
 }
 
 const db = firebase.firestore();

@@ -134,8 +134,9 @@ function renderCafe(doc) {
   daysToDeadline.textContent = Math.floor((new Date(doc.data().date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   var formattedText = "".concat(taskName.innerHTML, " => ").concat(quantity.innerHTML, " by ").concat(date.innerHTML, " ||  ").concat(daysToDeadline.innerHTML, " days remaining  ");
   var textNode = document.createTextNode(formattedText);
-  console.log(textNode);
-  thingsList.appendChild(textNode);
+  li.appendChild(textNode);
+  console.log(li);
+  thingsList.appendChild(li);
 }
 
 var db = firebase.firestore();

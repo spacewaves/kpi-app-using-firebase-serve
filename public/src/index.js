@@ -108,13 +108,12 @@ const handleClick = () => {
     date: date,
   });
 
-  unsubscribe = thingsRef.onSnapshot((querySnapshot) => {
-    const items = querySnapshot.docs.map((doc) => {
-      return `<li>${doc.data().taskName}</li>`;
-    });
+  var z = document.createElement("LI"); // is a node
+  z.innerHTML = `${taskName} => ${quantity} by ${date} ||   days remaining `;
 
-    thingsList.innerHTML = items.join("");
-  });
+  thingsList.appendChild(z);
+
+  renderCafe(z);
 };
 
 const updateUI = (item) => {
@@ -122,7 +121,7 @@ const updateUI = (item) => {
 
   var node = document.createElement("LI");
 
-  const formattedText = `${taskName} => ${quantity} by ${date} ||  ${item.daysToDeadline} days remaining `;
+  const formattedText = `${taskName} => ${quantity} by ${date} ||   days remaining `;
   const textNode = document.createTextNode(formattedText);
 
   const deleteButton = document.createElement("button");

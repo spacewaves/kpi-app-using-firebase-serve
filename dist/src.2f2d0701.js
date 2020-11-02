@@ -208,12 +208,11 @@ var handleClick = function handleClick() {
     quantity: quantity,
     date: date
   });
-  unsubscribe = thingsRef.onSnapshot(function (querySnapshot) {
-    var items = querySnapshot.docs.map(function (doc) {
-      return "<li>".concat(doc.data().taskName, "</li>");
-    });
-    thingsList.innerHTML = items.join("");
-  });
+  var z = document.createElement("LI"); // is a node
+
+  z.innerHTML = "".concat(taskName, " => ").concat(quantity, " by ").concat(date, " ||   days remaining ");
+  thingsList.appendChild(z);
+  renderCafe(z);
 };
 
 var updateUI = function updateUI(item) {
@@ -221,7 +220,7 @@ var updateUI = function updateUI(item) {
       quantity = item.quantity,
       date = item.date;
   var node = document.createElement("LI");
-  var formattedText = "".concat(taskName, " => ").concat(quantity, " by ").concat(date, " ||  ").concat(item.daysToDeadline, " days remaining ");
+  var formattedText = "".concat(taskName, " => ").concat(quantity, " by ").concat(date, " ||   days remaining ");
   var textNode = document.createTextNode(formattedText);
   var deleteButton = document.createElement("button");
   deleteButton.textContent = "remove";
@@ -307,7 +306,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58774" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60010" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

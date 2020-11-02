@@ -17,16 +17,11 @@ function renderCafe(doc) {
       (1000 * 60 * 60 * 24)
   );
 
-  console.log(taskName);
-  li.appendChild(taskName);
-  li.appendChild(quantity);
-  li.appendChild(date);
-  li.appendChild(daysToDeadline);
+  const formattedText = `${taskName.innerHTML} => ${quantity.innerHTML} by ${date.innerHTML} ||  ${daysToDeadline.innerHTML} days remaining  `;
 
-  const formattedText = `${taskName} => ${quantity} by ${date} ||  ${daysToDeadline} days remaining `;
-  const textNode = document.createTextNode(formattedText);
+  let textNode = document.createTextNode(formattedText);
   console.log(textNode);
-  thingsList.appendChild(li);
+  thingsList.appendChild(textNode);
 }
 
 const db = firebase.firestore();
@@ -146,7 +141,6 @@ let items = getMyTasks();
 items.forEach(function (item) {
   updateUI(item);
 });
-
 // add a button called show server tasks
 var button = document.createElement("button");
 button.innerHTML = "Show server tasks";

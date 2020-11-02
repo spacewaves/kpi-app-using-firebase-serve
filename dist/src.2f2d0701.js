@@ -117,86 +117,33 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
-var bundleURL = null;
+})({"public/src/index.js":[function(require,module,exports) {
+thingsList = document.getElementById("myList");
 
-function getBundleURLCached() {
-  if (!bundleURL) {
-    bundleURL = getBundleURL();
-  }
-
-  return bundleURL;
+function renderCafe(doc) {
+  var li = document.createElement("LI");
+  var taskName = document.createElement("span");
+  var quantity = document.createElement("span");
+  var date = document.createElement("span");
+  var daysToDeadline = document.createElement("span");
+  li.setAttribute("data-id", doc.id);
+  taskName.textContent = doc.data().taskName;
+  quantity.textContent = doc.data().quantity;
+  date.textContent = doc.data().date;
+  var today = new Date();
+  daysToDeadline.textContent = Math.floor((new Date(doc.data().date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  var formattedText = "".concat(taskName.innerHTML, " => ").concat(quantity.innerHTML, " by ").concat(date.innerHTML, " ||  ").concat(daysToDeadline.innerHTML, " days remaining  ");
+  var textNode = document.createTextNode(formattedText);
+  console.log(textNode);
+  thingsList.appendChild(textNode);
 }
 
-function getBundleURL() {
-  // Attempt to find the URL of the current script and use that as the base URL
-  try {
-    throw new Error();
-  } catch (err) {
-    var matches = ('' + err.stack).match(/(https?|file|ftp|chrome-extension|moz-extension):\/\/[^)\n]+/g);
-
-    if (matches) {
-      return getBaseURL(matches[0]);
-    }
-  }
-
-  return '/';
-}
-
-function getBaseURL(url) {
-  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)\/[^/]+$/, '$1') + '/';
-}
-
-exports.getBundleURL = getBundleURLCached;
-exports.getBaseURL = getBaseURL;
-},{}],"node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
-var bundle = require('./bundle-url');
-
-function updateLink(link) {
-  var newLink = link.cloneNode();
-
-  newLink.onload = function () {
-    link.remove();
-  };
-
-  newLink.href = link.href.split('?')[0] + '?' + Date.now();
-  link.parentNode.insertBefore(newLink, link.nextSibling);
-}
-
-var cssTimeout = null;
-
-function reloadCSS() {
-  if (cssTimeout) {
-    return;
-  }
-
-  cssTimeout = setTimeout(function () {
-    var links = document.querySelectorAll('link[rel="stylesheet"]');
-
-    for (var i = 0; i < links.length; i++) {
-      if (bundle.getBaseURL(links[i].href) === bundle.getBundleURL()) {
-        updateLink(links[i]);
-      }
-    }
-
-    cssTimeout = null;
-  }, 50);
-}
-
-module.exports = reloadCSS;
-},{"./bundle-url":"node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"public/src/styles.css":[function(require,module,exports) {
-var reloadCSS = require('_css_loader');
-
-module.hot.dispose(reloadCSS);
-module.hot.accept(reloadCSS);
-},{"_css_loader":"node_modules/parcel-bundler/src/builtins/css-loader.js"}],"public/src/data.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
+var db = firebase.firestore();
+db.collection("things").get().then(function (snapshot) {
+  snapshot.docs.forEach(function (doc) {
+    renderCafe(doc);
+  });
 });
-exports.myTasks = void 0;
-// change this file
 var myTasks = [{
   taskName: "contact clients",
   quantity: "5",
@@ -210,45 +157,23 @@ var myTasks = [{
   quantity: "3000",
   date: "10/11/11100"
 }];
-exports.myTasks = myTasks;
-},{}],"public/src/server.js":[function(require,module,exports) {
-"use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.addTaskToServer = exports.getMyTasks = void 0;
-
-var _data = require("./data");
+var addTaskToServer = function addTaskToServer(task) {
+  // some code to add task
+  myTasks.push(task);
+};
 
 var getMyTasks = function getMyTasks() {
   // you need to use myTasks!!!
   // change coded below
   //
   var today = new Date();
-
-  _data.myTasks.forEach(function (task) {
+  myTasks.forEach(function (task) {
     return task.daysToDeadline = Math.floor((new Date(task.date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   }); // change code above
 
-
-  return _data.myTasks;
+  return myTasks;
 };
-
-exports.getMyTasks = getMyTasks;
-
-var addTaskToServer = function addTaskToServer(task) {
-  // some code to add task
-  _data.myTasks.push(task);
-};
-
-exports.addTaskToServer = addTaskToServer;
-},{"./data":"public/src/data.js"}],"public/src/index.js":[function(require,module,exports) {
-"use strict";
-
-require("./styles.css");
-
-var _server = require("./server");
 
 var getInputFieldsValues = function getInputFieldsValues() {
   var taskName = document.getElementById("task").value;
@@ -265,18 +190,29 @@ var handleClick = function handleClick() {
   var _getInputFieldsValues = getInputFieldsValues(),
       taskName = _getInputFieldsValues.taskName,
       quantity = _getInputFieldsValues.quantity,
-      date = _getInputFieldsValues.date; // POST task to server
+      date = _getInputFieldsValues.date; // // POST task to server
+  // addTaskToServer({ taskName, quantity, date });
+  // let addedTasks = getMyTasks();
+  // let lastTaskAdded = addedTasks[addedTasks.length - 1];
+  // updateUI(lastTaskAdded);
 
 
-  (0, _server.addTaskToServer)({
+  var db = firebase.firestore();
+  thingsList = document.getElementById("myList");
+  var thingsRef;
+  var unsubscribe;
+  thingsRef = db.collection("things");
+  thingsRef.add({
     taskName: taskName,
     quantity: quantity,
     date: date
   });
-  var addedTasks = (0, _server.getMyTasks)();
-  var lastTaskAdded = addedTasks[addedTasks.length - 1];
-  console.log(firebase);
-  updateUI(lastTaskAdded);
+  unsubscribe = thingsRef.onSnapshot(function (querySnapshot) {
+    var items = querySnapshot.docs.map(function (doc) {
+      return "<li>".concat(doc.data().taskName, "</li>");
+    });
+    thingsList.innerHTML = items.join("");
+  });
 };
 
 var updateUI = function updateUI(item) {
@@ -300,7 +236,7 @@ var updateUI = function updateUI(item) {
 
 var addButton = document.getElementById("myBtn");
 addButton.addEventListener("click", handleClick);
-var items = (0, _server.getMyTasks)();
+var items = getMyTasks();
 items.forEach(function (item) {
   updateUI(item);
 }); // add a button called show server tasks
@@ -311,9 +247,38 @@ document.body.appendChild(button); //const hello = console.log(getMyTasks())
 //console.log(hello)
 
 button.addEventListener("click", function () {
-  return console.log((0, _server.getMyTasks)());
-});
-},{"./styles.css":"public/src/styles.css","./server":"public/src/server.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+  return console.log(getMyTasks());
+}); // change code above
+
+var auth = firebase.auth();
+var whenSignedIn = document.getElementById("whenSignedIn");
+var whenSignedOut = document.getElementById("whenSignedOut");
+var signInBtn = document.getElementById("signInBtn");
+var signOutBtn = document.getElementById("signOutBtn");
+var userDetails = document.getElementById("userDetails");
+var provider = new firebase.auth.GoogleAuthProvider();
+
+signInBtn.onclick = function () {
+  return auth.signInWithPopup(provider);
+};
+
+signOutBtn.onclick = function () {
+  return auth.signOut();
+};
+
+auth.onAuthStateChanged(function (user) {
+  if (user) {
+    whenSignedIn.hidden = false;
+    whenSignedOut.hidden = true;
+    userDetails.innerHTML = "<h3>Hello ".concat(user.displayName, "!</h3> <p>User ID: ").concat(user.uid, "</p>");
+  } else {
+    // not signed in
+    whenSignedIn.hidden = true;
+    whenSignedOut.hidden = false;
+    userDetails.innerHTML = "";
+  }
+}); ///// Firestore /////
+},{}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -341,7 +306,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56255" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58774" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

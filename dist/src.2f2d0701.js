@@ -145,35 +145,10 @@ db.collection("things").get().then(function (snapshot) {
     renderCafe(doc);
   });
 });
-var myTasks = [{
-  taskName: "contact clients",
-  quantity: "5",
-  date: "10/04/2500"
-}, {
-  taskName: "make cakes",
-  quantity: "100",
-  date: "10/04/2200"
-}, {
-  taskName: "get pizza",
-  quantity: "3000",
-  date: "10/11/11100"
-}];
 
 var addTaskToServer = function addTaskToServer(task) {
   // some code to add task
   myTasks.push(task);
-};
-
-var getMyTasks = function getMyTasks() {
-  // you need to use myTasks!!!
-  // change coded below
-  //
-  var today = new Date();
-  myTasks.forEach(function (task) {
-    return task.daysToDeadline = Math.floor((new Date(task.date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  }); // change code above
-
-  return myTasks;
 };
 
 var getInputFieldsValues = function getInputFieldsValues() {
@@ -187,8 +162,8 @@ var getInputFieldsValues = function getInputFieldsValues() {
   };
 };
 
-var handleClick = function handleClick() {
-  var _getInputFieldsValues = getInputFieldsValues(),
+var handleClick = function handleClick(item) {
+  var _getInputFieldsValues = getInputFieldsValues(item),
       taskName = _getInputFieldsValues.taskName,
       quantity = _getInputFieldsValues.quantity,
       date = _getInputFieldsValues.date; // // POST task to server
@@ -198,86 +173,34 @@ var handleClick = function handleClick() {
   // updateUI(lastTaskAdded);
 
 
+  console.log(getInputFieldsValues(item).date);
   var db = firebase.firestore();
   thingsList = document.getElementById("myList");
   var thingsRef;
-  var unsubscribe;
   thingsRef = db.collection("things");
   thingsRef.add({
     taskName: taskName,
     quantity: quantity,
     date: date
   });
+  var today = new Date();
+  item.daysToDeadline = Math.floor((new Date(getInputFieldsValues(item).date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   var z = document.createElement("LI"); // is a node
 
-  z.innerHTML = "".concat(taskName, " => ").concat(quantity, " by ").concat(date, " ||   days remaining ");
-  thingsList.appendChild(z);
-  renderCafe(z);
-};
-
-var updateUI = function updateUI(item) {
-  var taskName = item.taskName,
-      quantity = item.quantity,
-      date = item.date;
-  var node = document.createElement("LI");
-  var formattedText = "".concat(taskName, " => ").concat(quantity, " by ").concat(date, " ||   days remaining ");
-  var textNode = document.createTextNode(formattedText);
+  z.innerHTML = "".concat(taskName, " => ").concat(quantity, " by ").concat(date, " ||  ").concat(item.daysToDeadline, " days remaining ");
   var deleteButton = document.createElement("button");
   deleteButton.textContent = "remove";
 
   deleteButton.onclick = function () {
-    return node.remove();
+    return z.remove();
   };
 
-  node.appendChild(textNode);
-  node.appendChild(deleteButton);
-  document.getElementById("myList").appendChild(node);
+  thingsList.appendChild(z);
+  thingsList.appendChild(deleteButton);
 };
 
 var addButton = document.getElementById("myBtn");
 addButton.addEventListener("click", handleClick);
-var items = getMyTasks();
-items.forEach(function (item) {
-  updateUI(item);
-}); // add a button called show server tasks
-
-var button = document.createElement("button");
-button.innerHTML = "Show server tasks";
-document.body.appendChild(button); //const hello = console.log(getMyTasks())
-//console.log(hello)
-
-button.addEventListener("click", function () {
-  return console.log(getMyTasks());
-}); // change code above
-
-var auth = firebase.auth();
-var whenSignedIn = document.getElementById("whenSignedIn");
-var whenSignedOut = document.getElementById("whenSignedOut");
-var signInBtn = document.getElementById("signInBtn");
-var signOutBtn = document.getElementById("signOutBtn");
-var userDetails = document.getElementById("userDetails");
-var provider = new firebase.auth.GoogleAuthProvider();
-
-signInBtn.onclick = function () {
-  return auth.signInWithPopup(provider);
-};
-
-signOutBtn.onclick = function () {
-  return auth.signOut();
-};
-
-auth.onAuthStateChanged(function (user) {
-  if (user) {
-    whenSignedIn.hidden = false;
-    whenSignedOut.hidden = true;
-    userDetails.innerHTML = "<h3>Hello ".concat(user.displayName, "!</h3> <p>User ID: ").concat(user.uid, "</p>");
-  } else {
-    // not signed in
-    whenSignedIn.hidden = true;
-    whenSignedOut.hidden = false;
-    userDetails.innerHTML = "";
-  }
-}); ///// Firestore /////
 },{}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';

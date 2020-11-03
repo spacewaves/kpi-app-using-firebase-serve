@@ -1,6 +1,6 @@
 thingsList = document.getElementById("myList");
 
-function renderCafe(doc) {
+function createList(doc) {
   let li = document.createElement("LI");
   let taskName = document.createElement("span");
   let quantity = document.createElement("span");
@@ -21,9 +21,14 @@ function renderCafe(doc) {
 
   let textNode = document.createTextNode(formattedText);
 
+  const deleteButton = document.createElement("button");
+  deleteButton.textContent = "remove";
+  deleteButton.onclick = () => li.remove();
+
   li.appendChild(textNode);
   console.log(li);
   thingsList.appendChild(li);
+  thingsList.appendChild(deleteButton);
 }
 
 const db = firebase.firestore();
@@ -31,14 +36,9 @@ db.collection("things")
   .get()
   .then((snapshot) => {
     snapshot.docs.forEach((doc) => {
-      renderCafe(doc);
+      createList(doc);
     });
   });
-
-const addTaskToServer = (task) => {
-  // some code to add task
-  myTasks.push(task);
-};
 
 const getInputFieldsValues = () => {
   var taskName = document.getElementById("task").value;
@@ -50,14 +50,6 @@ const getInputFieldsValues = () => {
 
 const handleClick = (item) => {
   const { taskName, quantity, date } = getInputFieldsValues(item);
-
-  // // POST task to server
-  // addTaskToServer({ taskName, quantity, date });
-  // let addedTasks = getMyTasks();
-  // let lastTaskAdded = addedTasks[addedTasks.length - 1];
-  // updateUI(lastTaskAdded);
-
-  console.log(getInputFieldsValues(item).date);
 
   const db = firebase.firestore();
   thingsList = document.getElementById("myList");

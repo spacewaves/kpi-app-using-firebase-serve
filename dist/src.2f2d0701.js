@@ -120,7 +120,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 })({"public/src/index.js":[function(require,module,exports) {
 thingsList = document.getElementById("myList");
 
-function renderCafe(doc) {
+function createList(doc) {
   var li = document.createElement("LI");
   var taskName = document.createElement("span");
   var quantity = document.createElement("span");
@@ -134,22 +134,25 @@ function renderCafe(doc) {
   daysToDeadline.textContent = Math.floor((new Date(doc.data().date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   var formattedText = "".concat(taskName.innerHTML, " => ").concat(quantity.innerHTML, " by ").concat(date.innerHTML, " ||  ").concat(daysToDeadline.innerHTML, " days remaining  ");
   var textNode = document.createTextNode(formattedText);
+  var deleteButton = document.createElement("button");
+  deleteButton.textContent = "remove";
+
+  deleteButton.onclick = function () {
+    return li.remove();
+  };
+
   li.appendChild(textNode);
   console.log(li);
   thingsList.appendChild(li);
+  thingsList.appendChild(deleteButton);
 }
 
 var db = firebase.firestore();
 db.collection("things").get().then(function (snapshot) {
   snapshot.docs.forEach(function (doc) {
-    renderCafe(doc);
+    createList(doc);
   });
 });
-
-var addTaskToServer = function addTaskToServer(task) {
-  // some code to add task
-  myTasks.push(task);
-};
 
 var getInputFieldsValues = function getInputFieldsValues() {
   var taskName = document.getElementById("task").value;
@@ -166,14 +169,8 @@ var handleClick = function handleClick(item) {
   var _getInputFieldsValues = getInputFieldsValues(item),
       taskName = _getInputFieldsValues.taskName,
       quantity = _getInputFieldsValues.quantity,
-      date = _getInputFieldsValues.date; // // POST task to server
-  // addTaskToServer({ taskName, quantity, date });
-  // let addedTasks = getMyTasks();
-  // let lastTaskAdded = addedTasks[addedTasks.length - 1];
-  // updateUI(lastTaskAdded);
+      date = _getInputFieldsValues.date;
 
-
-  console.log(getInputFieldsValues(item).date);
   var db = firebase.firestore();
   thingsList = document.getElementById("myList");
   var thingsRef;
@@ -229,7 +226,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60010" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57396" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

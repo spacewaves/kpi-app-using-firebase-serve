@@ -118,6 +118,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   return newRequire;
 })({"public/src/index.js":[function(require,module,exports) {
+// Make a list
 thingsList = document.getElementById("myList");
 
 function createList(doc) {
@@ -129,30 +130,35 @@ function createList(doc) {
   li.setAttribute("data-id", doc.id);
   taskName.textContent = doc.data().taskName;
   quantity.textContent = doc.data().quantity;
-  date.textContent = doc.data().date;
+  date.textContent = doc.data().date; // Calculate days to deadline
+
   var today = new Date();
-  daysToDeadline.textContent = Math.floor((new Date(doc.data().date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  daysToDeadline.textContent = Math.floor((new Date(doc.data().date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24)); // Create text node
+
   var formattedText = "".concat(taskName.innerHTML, " => ").concat(quantity.innerHTML, " by ").concat(date.innerHTML, " ||  ").concat(daysToDeadline.innerHTML, " days remaining  ");
-  var textNode = document.createTextNode(formattedText);
+  var textNode = document.createTextNode(formattedText); // Create delete button
+
   var deleteButton = document.createElement("button");
   deleteButton.textContent = "remove";
 
   deleteButton.onclick = function () {
     return li.remove();
-  };
+  }; // Add text node to list items
 
-  li.appendChild(textNode);
-  console.log(li);
+
+  li.appendChild(textNode); // Add list items and delete button to list
+
   thingsList.appendChild(li);
   thingsList.appendChild(deleteButton);
-}
+} // Display List on UI
+
 
 var db = firebase.firestore();
 db.collection("things").get().then(function (snapshot) {
   snapshot.docs.forEach(function (doc) {
     createList(doc);
   });
-});
+}); // Get Input fields
 
 var getInputFieldsValues = function getInputFieldsValues() {
   var taskName = document.getElementById("task").value;
@@ -174,27 +180,32 @@ var handleClick = function handleClick(item) {
   var db = firebase.firestore();
   thingsList = document.getElementById("myList");
   var thingsRef;
-  thingsRef = db.collection("things");
+  thingsRef = db.collection("things"); // add input field values to firebase
+
   thingsRef.add({
     taskName: taskName,
     quantity: quantity,
     date: date
-  });
-  var today = new Date();
-  item.daysToDeadline = Math.floor((new Date(getInputFieldsValues(item).date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  var z = document.createElement("LI"); // is a node
+  }); // calculate days to deadline
 
-  z.innerHTML = "".concat(taskName, " => ").concat(quantity, " by ").concat(date, " ||  ").concat(item.daysToDeadline, " days remaining ");
+  var today = new Date();
+  item.daysToDeadline = Math.floor((new Date(getInputFieldsValues(item).date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24)); // create list item with input fields values
+
+  var z = document.createElement("LI");
+  z.innerHTML = "".concat(taskName, " => ").concat(quantity, " by ").concat(date, " ||  ").concat(item.daysToDeadline, " days remaining "); // create delete button and functionality
+
   var deleteButton = document.createElement("button");
   deleteButton.textContent = "remove";
 
   deleteButton.onclick = function () {
     return z.remove();
-  };
+  }; // add list items and delete button to list
+
 
   thingsList.appendChild(z);
   thingsList.appendChild(deleteButton);
-};
+}; // add button
+
 
 var addButton = document.getElementById("myBtn");
 addButton.addEventListener("click", handleClick);

@@ -1,5 +1,5 @@
+// Make a list
 thingsList = document.getElementById("myList");
-
 function createList(doc) {
   let li = document.createElement("LI");
   let taskName = document.createElement("span");
@@ -11,26 +11,31 @@ function createList(doc) {
   quantity.textContent = doc.data().quantity;
   date.textContent = doc.data().date;
 
+  // Calculate days to deadline
   var today = new Date();
   daysToDeadline.textContent = Math.floor(
     (new Date(doc.data().date).getTime() - today.getTime()) /
       (1000 * 60 * 60 * 24)
   );
 
+  // Create text node
   const formattedText = `${taskName.innerHTML} => ${quantity.innerHTML} by ${date.innerHTML} ||  ${daysToDeadline.innerHTML} days remaining  `;
-
   let textNode = document.createTextNode(formattedText);
 
+  // Create delete button
   const deleteButton = document.createElement("button");
   deleteButton.textContent = "remove";
   deleteButton.onclick = () => li.remove();
 
+  // Add text node to list items
   li.appendChild(textNode);
-  console.log(li);
+
+  // Add list items and delete button to list
   thingsList.appendChild(li);
   thingsList.appendChild(deleteButton);
 }
 
+// Display List on UI
 const db = firebase.firestore();
 db.collection("things")
   .get()
@@ -40,6 +45,7 @@ db.collection("things")
     });
   });
 
+// Get Input fields
 const getInputFieldsValues = () => {
   var taskName = document.getElementById("task").value;
   var quantity = document.getElementById("quantity").value;
@@ -56,28 +62,33 @@ const handleClick = (item) => {
   let thingsRef;
   thingsRef = db.collection("things");
 
+  // add input field values to firebase
   thingsRef.add({
     taskName: taskName,
     quantity: quantity,
     date: date,
   });
 
+  // calculate days to deadline
   var today = new Date();
   item.daysToDeadline = Math.floor(
     (new Date(getInputFieldsValues(item).date).getTime() - today.getTime()) /
       (1000 * 60 * 60 * 24)
   );
 
-  var z = document.createElement("LI"); // is a node
+  // create list item with input fields values
+  var z = document.createElement("LI");
   z.innerHTML = `${taskName} => ${quantity} by ${date} ||  ${item.daysToDeadline} days remaining `;
 
+  // create delete button and functionality
   const deleteButton = document.createElement("button");
   deleteButton.textContent = "remove";
   deleteButton.onclick = () => z.remove();
 
+  // add list items and delete button to list
   thingsList.appendChild(z);
   thingsList.appendChild(deleteButton);
 };
-
+// add button
 const addButton = document.getElementById("myBtn");
 addButton.addEventListener("click", handleClick);

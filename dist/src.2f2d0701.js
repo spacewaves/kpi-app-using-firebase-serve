@@ -121,7 +121,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 // Make a list
 thingsList = document.getElementById("myList");
 
-function createList(doc) {
+function createElementList(doc) {
   var li = document.createElement("LI");
   var taskName = document.createElement("span");
   var quantity = document.createElement("span");
@@ -129,6 +129,7 @@ function createList(doc) {
   var daysToDeadline = document.createElement("span");
   var cross = document.createElement("div");
   li.setAttribute("data-id", doc.id);
+  console.log(li.setAttribute("data-id", doc.id));
   taskName.textContent = doc.data().taskName;
   quantity.textContent = doc.data().quantity;
   date.textContent = doc.data().date;
@@ -137,16 +138,14 @@ function createList(doc) {
   var today = new Date();
   daysToDeadline.textContent = Math.floor((new Date(doc.data().date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24)); // Create text node
 
-  var formattedText = "".concat(taskName.innerHTML, " => ").concat(quantity.innerHTML, " by ").concat(date.innerHTML, " ||  ").concat(daysToDeadline.innerHTML, " days remaining  ");
+  var formattedText = "".concat(doc.data().taskName, " => ").concat(quantity.innerHTML, " by ").concat(date.innerHTML, " ||  ").concat(daysToDeadline.innerHTML, " days remaining  ");
   var textNode = document.createTextNode(formattedText); // Create delete button
-
-  var deleteButton = document.createElement("button");
-  deleteButton.textContent = "remove";
-
-  deleteButton.onclick = function () {
-    li.remove();
-    console.log("hello");
-  };
+  // const deleteButton = document.createElement("button");
+  // deleteButton.textContent = "remove";
+  // deleteButton.onclick = () => {
+  //   li.remove();
+  //   console.log("hello");
+  // };
 
   cross.addEventListener("click", function (e) {
     e.stopPropagation();
@@ -159,14 +158,13 @@ function createList(doc) {
   li.appendChild(cross); // Add list items and delete button to list
 
   thingsList.appendChild(li);
-  thingsList.appendChild(deleteButton);
 } // Display List on UI
 
 
 var db = firebase.firestore();
 db.collection("things").get().then(function (snapshot) {
   snapshot.docs.forEach(function (doc) {
-    createList(doc);
+    createElementList(doc);
   });
 }); // Get Input fields
 
@@ -196,36 +194,49 @@ var handleClick = function handleClick(item) {
     taskName: taskName,
     quantity: quantity,
     date: date
-  }); // calculate days to deadline
-
-  var today = new Date();
-  item.daysToDeadline = Math.floor((new Date(getInputFieldsValues(item).date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24)); // create list item with input fields values
-
-  var z = document.createElement("LI");
-  z.innerHTML = "".concat(taskName, " => ").concat(quantity, " by ").concat(date, " ||  ").concat(item.daysToDeadline, " days remaining ");
-  z.setAttribute("data-id", doc.id);
-  z.addEventListener("click", function (e) {
-    e.stopPropagation();
-    var id = e.target.parentElement.getAttribute("data-id");
-    db.collection("things").doc(id).delete();
-    li.remove(id);
-  }); // create delete button and functionality
-
-  var deleteButton = document.createElement("button");
-  deleteButton.textContent = "remove";
-
-  deleteButton.onclick = function () {
-    return z.remove();
-  }; // add list items and delete button to list
-
-
-  thingsList.appendChild(z);
-  thingsList.appendChild(deleteButton);
+  });
+  deleteList();
+  db.collection("things").get().then(function (snapshot) {
+    snapshot.docs.forEach(function (doc) {
+      createElementList(doc);
+    });
+  }); //  // calculate days to deadline
+  //  var today = new Date();
+  //  item.daysToDeadline = Math.floor(
+  //    (new Date(getInputFieldsValues(item).date).getTime() - today.getTime()) /
+  //      (1000 * 60 * 60 * 24)
+  //  );
+  //
+  //  // create list item with input fields values
+  //  var z = document.createElement("LI");
+  //  z.innerHTML = `${taskName} => ${quantity} by ${date} ||  ${item.daysToDeadline} days remaining `;
+  //
+  //  // create delete button and functionality
+  //  const deleteButton = document.createElement("button");
+  //  deleteButton.textContent = "remove";
+  //  deleteButton.onclick = () => z.remove();
+  //
+  //  // add list items and delete button to list
+  //
+  //  // add list items and delete button to list
+  //  thingsList.appendChild(z);
+  //  thingsList.appendChild(deleteButton);
 }; // add button
 
 
 var addButton = document.getElementById("myBtn");
 addButton.addEventListener("click", handleClick);
+var deleteListButton = document.createElement("button"); // block
+
+var deleteList = function deleteList() {
+  thingsList.remove();
+  thingsList = document.createElement("ul");
+  thingsList.id = "myList";
+  document.getElementById("root").appendChild(thingsList);
+};
+
+deleteListButton.addEventListener("click", deleteList);
+document.body.appendChild(deleteListButton);
 },{}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';

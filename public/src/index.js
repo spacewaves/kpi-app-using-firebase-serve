@@ -1,6 +1,6 @@
 // Make a list
 thingsList = document.getElementById("myList");
-function createList(doc) {
+function createElementList(doc) {
   let li = document.createElement("LI");
   let taskName = document.createElement("span");
   let quantity = document.createElement("span");
@@ -9,6 +9,7 @@ function createList(doc) {
   let cross = document.createElement("div");
 
   li.setAttribute("data-id", doc.id);
+  console.log(li.setAttribute("data-id", doc.id));
   taskName.textContent = doc.data().taskName;
   quantity.textContent = doc.data().quantity;
   date.textContent = doc.data().date;
@@ -22,16 +23,18 @@ function createList(doc) {
   );
 
   // Create text node
-  const formattedText = `${taskName.innerHTML} => ${quantity.innerHTML} by ${date.innerHTML} ||  ${daysToDeadline.innerHTML} days remaining  `;
+  const formattedText = `${doc.data().taskName} => ${quantity.innerHTML} by ${
+    date.innerHTML
+  } ||  ${daysToDeadline.innerHTML} days remaining  `;
   let textNode = document.createTextNode(formattedText);
 
   // Create delete button
-  const deleteButton = document.createElement("button");
-  deleteButton.textContent = "remove";
-  deleteButton.onclick = () => {
-    li.remove();
-    console.log("hello");
-  };
+  // const deleteButton = document.createElement("button");
+  // deleteButton.textContent = "remove";
+  // deleteButton.onclick = () => {
+  //   li.remove();
+  //   console.log("hello");
+  // };
 
   cross.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -46,7 +49,6 @@ function createList(doc) {
 
   // Add list items and delete button to list
   thingsList.appendChild(li);
-  thingsList.appendChild(deleteButton);
 }
 
 // Display List on UI
@@ -55,7 +57,7 @@ db.collection("things")
   .get()
   .then((snapshot) => {
     snapshot.docs.forEach((doc) => {
-      createList(doc);
+      createElementList(doc);
     });
   });
 
@@ -82,36 +84,50 @@ const handleClick = (item) => {
     quantity: quantity,
     date: date,
   });
+  deleteList();
+  db.collection("things")
+    .get()
+    .then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        createElementList(doc);
+      });
+    });
 
-  // calculate days to deadline
-  var today = new Date();
-  item.daysToDeadline = Math.floor(
-    (new Date(getInputFieldsValues(item).date).getTime() - today.getTime()) /
-      (1000 * 60 * 60 * 24)
-  );
-
-  // create list item with input fields values
-  var z = document.createElement("LI");
-  z.innerHTML = `${taskName} => ${quantity} by ${date} ||  ${item.daysToDeadline} days remaining `;
-
-  z.setAttribute("data-id", doc.id);
-
-  z.addEventListener("click", (e) => {
-    e.stopPropagation();
-    let id = e.target.parentElement.getAttribute("data-id");
-    db.collection("things").doc(id).delete();
-    li.remove(id);
-  });
-
-  // create delete button and functionality
-  const deleteButton = document.createElement("button");
-  deleteButton.textContent = "remove";
-  deleteButton.onclick = () => z.remove();
-
-  // add list items and delete button to list
-  thingsList.appendChild(z);
-  thingsList.appendChild(deleteButton);
+  //  // calculate days to deadline
+  //  var today = new Date();
+  //  item.daysToDeadline = Math.floor(
+  //    (new Date(getInputFieldsValues(item).date).getTime() - today.getTime()) /
+  //      (1000 * 60 * 60 * 24)
+  //  );
+  //
+  //  // create list item with input fields values
+  //  var z = document.createElement("LI");
+  //  z.innerHTML = `${taskName} => ${quantity} by ${date} ||  ${item.daysToDeadline} days remaining `;
+  //
+  //  // create delete button and functionality
+  //  const deleteButton = document.createElement("button");
+  //  deleteButton.textContent = "remove";
+  //  deleteButton.onclick = () => z.remove();
+  //
+  //  // add list items and delete button to list
+  //
+  //  // add list items and delete button to list
+  //  thingsList.appendChild(z);
+  //  thingsList.appendChild(deleteButton);
 };
 // add button
 const addButton = document.getElementById("myBtn");
 addButton.addEventListener("click", handleClick);
+
+const deleteListButton = document.createElement("button");
+
+// block
+const deleteList = () => {
+  thingsList.remove();
+  thingsList = document.createElement("ul");
+  thingsList.id = "myList";
+  document.getElementById("root").appendChild(thingsList);
+};
+
+deleteListButton.addEventListener("click", deleteList);
+document.body.appendChild(deleteListButton);

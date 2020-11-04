@@ -127,10 +127,12 @@ function createList(doc) {
   var quantity = document.createElement("span");
   var date = document.createElement("span");
   var daysToDeadline = document.createElement("span");
+  var cross = document.createElement("div");
   li.setAttribute("data-id", doc.id);
   taskName.textContent = doc.data().taskName;
   quantity.textContent = doc.data().quantity;
-  date.textContent = doc.data().date; // Calculate days to deadline
+  date.textContent = doc.data().date;
+  cross.textContent = "x"; // Calculate days to deadline
 
   var today = new Date();
   daysToDeadline.textContent = Math.floor((new Date(doc.data().date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24)); // Create text node
@@ -142,11 +144,19 @@ function createList(doc) {
   deleteButton.textContent = "remove";
 
   deleteButton.onclick = function () {
-    return li.remove();
-  }; // Add text node to list items
+    li.remove();
+    console.log("hello");
+  };
 
+  cross.addEventListener("click", function (e) {
+    e.stopPropagation();
+    var id = e.target.parentElement.getAttribute("data-id");
+    db.collection("things").doc(id).delete();
+    li.remove(id);
+  }); // Add text node to list items
 
-  li.appendChild(textNode); // Add list items and delete button to list
+  li.appendChild(textNode);
+  li.appendChild(cross); // Add list items and delete button to list
 
   thingsList.appendChild(li);
   thingsList.appendChild(deleteButton);
@@ -192,7 +202,14 @@ var handleClick = function handleClick(item) {
   item.daysToDeadline = Math.floor((new Date(getInputFieldsValues(item).date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24)); // create list item with input fields values
 
   var z = document.createElement("LI");
-  z.innerHTML = "".concat(taskName, " => ").concat(quantity, " by ").concat(date, " ||  ").concat(item.daysToDeadline, " days remaining "); // create delete button and functionality
+  z.innerHTML = "".concat(taskName, " => ").concat(quantity, " by ").concat(date, " ||  ").concat(item.daysToDeadline, " days remaining ");
+  z.setAttribute("data-id", doc.id);
+  z.addEventListener("click", function (e) {
+    e.stopPropagation();
+    var id = e.target.parentElement.getAttribute("data-id");
+    db.collection("things").doc(id).delete();
+    li.remove(id);
+  }); // create delete button and functionality
 
   var deleteButton = document.createElement("button");
   deleteButton.textContent = "remove";
@@ -237,7 +254,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57396" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49165" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

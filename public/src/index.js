@@ -6,10 +6,13 @@ function createList(doc) {
   let quantity = document.createElement("span");
   let date = document.createElement("span");
   let daysToDeadline = document.createElement("span");
+  let cross = document.createElement("div");
+
   li.setAttribute("data-id", doc.id);
   taskName.textContent = doc.data().taskName;
   quantity.textContent = doc.data().quantity;
   date.textContent = doc.data().date;
+  cross.textContent = "x";
 
   // Calculate days to deadline
   var today = new Date();
@@ -25,10 +28,21 @@ function createList(doc) {
   // Create delete button
   const deleteButton = document.createElement("button");
   deleteButton.textContent = "remove";
-  deleteButton.onclick = () => li.remove();
+  deleteButton.onclick = () => {
+    li.remove();
+    console.log("hello");
+  };
+
+  cross.addEventListener("click", (e) => {
+    e.stopPropagation();
+    let id = e.target.parentElement.getAttribute("data-id");
+    db.collection("things").doc(id).delete();
+    li.remove(id);
+  });
 
   // Add text node to list items
   li.appendChild(textNode);
+  li.appendChild(cross);
 
   // Add list items and delete button to list
   thingsList.appendChild(li);
@@ -79,6 +93,15 @@ const handleClick = (item) => {
   // create list item with input fields values
   var z = document.createElement("LI");
   z.innerHTML = `${taskName} => ${quantity} by ${date} ||  ${item.daysToDeadline} days remaining `;
+
+  z.setAttribute("data-id", doc.id);
+
+  z.addEventListener("click", (e) => {
+    e.stopPropagation();
+    let id = e.target.parentElement.getAttribute("data-id");
+    db.collection("things").doc(id).delete();
+    li.remove(id);
+  });
 
   // create delete button and functionality
   const deleteButton = document.createElement("button");

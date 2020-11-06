@@ -163,7 +163,7 @@ function createElementList(doc) {
 
 function displayList() {
   var db = firebase.firestore();
-  db.collection("things").orderBy("created_at").get().then(function (snapshot) {
+  db.collection("things").orderBy("created_at", "desc").get().then(function (snapshot) {
     snapshot.docs.forEach(function (doc) {
       createElementList(doc);
     });

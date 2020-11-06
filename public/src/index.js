@@ -55,7 +55,7 @@ function createElementList(doc) {
 function displayList() {
   const db = firebase.firestore();
   db.collection("things")
-    .orderBy("created_at")
+    .orderBy("created_at", "desc")
     .get()
     .then((snapshot) => {
       snapshot.docs.forEach((doc) => {

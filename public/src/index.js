@@ -52,15 +52,18 @@ function createElementList(doc) {
 }
 
 // Display List on UI
-const db = firebase.firestore();
-db.collection("things")
-  .get()
-  .then((snapshot) => {
-    snapshot.docs.forEach((doc) => {
-      createElementList(doc);
+function displayList() {
+  const db = firebase.firestore();
+  db.collection("things")
+    .orderBy("created_at")
+    .get()
+    .then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        createElementList(doc);
+      });
     });
-  });
-
+}
+displayList();
 // Get Input fields
 const getInputFieldsValues = () => {
   var taskName = document.getElementById("task").value;
@@ -83,37 +86,10 @@ const handleClick = (item) => {
     taskName: taskName,
     quantity: quantity,
     date: date,
+    created_at: Date.now(),
   });
   deleteList();
-  db.collection("things")
-    .get()
-    .then((snapshot) => {
-      snapshot.docs.forEach((doc) => {
-        createElementList(doc);
-      });
-    });
-
-  //  // calculate days to deadline
-  //  var today = new Date();
-  //  item.daysToDeadline = Math.floor(
-  //    (new Date(getInputFieldsValues(item).date).getTime() - today.getTime()) /
-  //      (1000 * 60 * 60 * 24)
-  //  );
-  //
-  //  // create list item with input fields values
-  //  var z = document.createElement("LI");
-  //  z.innerHTML = `${taskName} => ${quantity} by ${date} ||  ${item.daysToDeadline} days remaining `;
-  //
-  //  // create delete button and functionality
-  //  const deleteButton = document.createElement("button");
-  //  deleteButton.textContent = "remove";
-  //  deleteButton.onclick = () => z.remove();
-  //
-  //  // add list items and delete button to list
-  //
-  //  // add list items and delete button to list
-  //  thingsList.appendChild(z);
-  //  thingsList.appendChild(deleteButton);
+  displayList();
 };
 // add button
 const addButton = document.getElementById("myBtn");

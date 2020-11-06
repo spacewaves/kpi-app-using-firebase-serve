@@ -161,12 +161,16 @@ function createElementList(doc) {
 } // Display List on UI
 
 
-var db = firebase.firestore();
-db.collection("things").get().then(function (snapshot) {
-  snapshot.docs.forEach(function (doc) {
-    createElementList(doc);
+function displayList() {
+  var db = firebase.firestore();
+  db.collection("things").orderBy("created_at").get().then(function (snapshot) {
+    snapshot.docs.forEach(function (doc) {
+      createElementList(doc);
+    });
   });
-}); // Get Input fields
+}
+
+displayList(); // Get Input fields
 
 var getInputFieldsValues = function getInputFieldsValues() {
   var taskName = document.getElementById("task").value;
@@ -193,34 +197,11 @@ var handleClick = function handleClick(item) {
   thingsRef.add({
     taskName: taskName,
     quantity: quantity,
-    date: date
+    date: date,
+    created_at: Date.now()
   });
   deleteList();
-  db.collection("things").get().then(function (snapshot) {
-    snapshot.docs.forEach(function (doc) {
-      createElementList(doc);
-    });
-  }); //  // calculate days to deadline
-  //  var today = new Date();
-  //  item.daysToDeadline = Math.floor(
-  //    (new Date(getInputFieldsValues(item).date).getTime() - today.getTime()) /
-  //      (1000 * 60 * 60 * 24)
-  //  );
-  //
-  //  // create list item with input fields values
-  //  var z = document.createElement("LI");
-  //  z.innerHTML = `${taskName} => ${quantity} by ${date} ||  ${item.daysToDeadline} days remaining `;
-  //
-  //  // create delete button and functionality
-  //  const deleteButton = document.createElement("button");
-  //  deleteButton.textContent = "remove";
-  //  deleteButton.onclick = () => z.remove();
-  //
-  //  // add list items and delete button to list
-  //
-  //  // add list items and delete button to list
-  //  thingsList.appendChild(z);
-  //  thingsList.appendChild(deleteButton);
+  displayList();
 }; // add button
 
 
@@ -265,7 +246,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49165" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52201" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

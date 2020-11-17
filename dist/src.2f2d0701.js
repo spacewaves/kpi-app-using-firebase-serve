@@ -118,7 +118,49 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   return newRequire;
 })({"public/src/index.js":[function(require,module,exports) {
-// Make a list
+var auth = firebase.auth();
+var whenSignedIn = document.getElementById("whenSignedIn");
+var whenSignedOut = document.getElementById("whenSignedOut");
+var signInBtn = document.getElementById("signInBtn");
+var signOutBtn = document.getElementById("signOutBtn");
+var userDetails = document.getElementById("userDetails");
+var provider = new firebase.auth.GoogleAuthProvider();
+
+signInBtn.onclick = function () {
+  auth.signInWithPopup(provider);
+  thingsList.style.display = "block";
+};
+
+signOutBtn.onclick = function () {
+  auth.signOut();
+  thingsList.style.display = "none";
+};
+
+auth.onAuthStateChanged(function (user) {
+  if (user) {
+    whenSignedIn.hidden = false;
+    whenSignedOut.hidden = true;
+    userDetails.innerHTML = "<h3>Hello ".concat(user.displayName, "</h3><p>User ID: ").concat(user.uid, "</p>"); // Display List on UI
+
+    function _displayList() {
+      var db = firebase.firestore();
+      db.collection("things").orderBy("created_at", "desc").get().then(function (snapshot) {
+        snapshot.docs.forEach(function (doc) {
+          createElementList(doc);
+        });
+      });
+    }
+
+    deleteList();
+
+    _displayList();
+  } else {
+    whenSignedIn.hidden = true;
+    whenSignedOut.hidden = false;
+    userDetails.innerHTML = "";
+  }
+}); // Make a list
+
 thingsList = document.getElementById("myList");
 
 function createElementList(doc) {
@@ -139,14 +181,7 @@ function createElementList(doc) {
   daysToDeadline.textContent = Math.floor((new Date(doc.data().date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24)); // Create text node
 
   var formattedText = "".concat(doc.data().taskName, " => ").concat(quantity.innerHTML, " by ").concat(date.innerHTML, " ||  ").concat(daysToDeadline.innerHTML, " days remaining  ");
-  var textNode = document.createTextNode(formattedText); // Create delete button
-  // const deleteButton = document.createElement("button");
-  // deleteButton.textContent = "remove";
-  // deleteButton.onclick = () => {
-  //   li.remove();
-  //   console.log("hello");
-  // };
-
+  var textNode = document.createTextNode(formattedText);
   cross.addEventListener("click", function (e) {
     e.stopPropagation();
     var id = e.target.parentElement.getAttribute("data-id");
@@ -158,19 +193,8 @@ function createElementList(doc) {
   li.appendChild(cross); // Add list items and delete button to list
 
   thingsList.appendChild(li);
-} // Display List on UI
+} // Get Input fields
 
-
-function displayList() {
-  var db = firebase.firestore();
-  db.collection("things").orderBy("created_at", "desc").get().then(function (snapshot) {
-    snapshot.docs.forEach(function (doc) {
-      createElementList(doc);
-    });
-  });
-}
-
-displayList(); // Get Input fields
 
 var getInputFieldsValues = function getInputFieldsValues() {
   var taskName = document.getElementById("task").value;
@@ -217,7 +241,6 @@ var deleteList = function deleteList() {
 };
 
 deleteListButton.addEventListener("click", deleteList);
-document.body.appendChild(deleteListButton);
 },{}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -246,7 +269,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52201" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55797" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

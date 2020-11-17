@@ -1,3 +1,50 @@
+const auth = firebase.auth();
+
+const whenSignedIn = document.getElementById("whenSignedIn");
+const whenSignedOut = document.getElementById("whenSignedOut");
+
+const signInBtn = document.getElementById("signInBtn");
+const signOutBtn = document.getElementById("signOutBtn");
+
+const userDetails = document.getElementById("userDetails");
+
+const provider = new firebase.auth.GoogleAuthProvider();
+
+signInBtn.onclick = () => {
+  auth.signInWithPopup(provider);
+  thingsList.style.display = "block";
+};
+signOutBtn.onclick = () => {
+  auth.signOut();
+  thingsList.style.display = "none";
+};
+
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    whenSignedIn.hidden = false;
+    whenSignedOut.hidden = true;
+    userDetails.innerHTML = `<h3>Hello ${user.displayName}</h3><p>User ID: ${user.uid}</p>`;
+    // Display List on UI
+    function displayList() {
+      const db = firebase.firestore();
+      db.collection("things")
+        .orderBy("created_at", "desc")
+        .get()
+        .then((snapshot) => {
+          snapshot.docs.forEach((doc) => {
+            createElementList(doc);
+          });
+        });
+    }
+    deleteList();
+    displayList();
+  } else {
+    whenSignedIn.hidden = true;
+    whenSignedOut.hidden = false;
+    userDetails.innerHTML = "";
+  }
+});
+
 // Make a list
 thingsList = document.getElementById("myList");
 function createElementList(doc) {
@@ -28,14 +75,6 @@ function createElementList(doc) {
   } ||  ${daysToDeadline.innerHTML} days remaining  `;
   let textNode = document.createTextNode(formattedText);
 
-  // Create delete button
-  // const deleteButton = document.createElement("button");
-  // deleteButton.textContent = "remove";
-  // deleteButton.onclick = () => {
-  //   li.remove();
-  //   console.log("hello");
-  // };
-
   cross.addEventListener("click", (e) => {
     e.stopPropagation();
     let id = e.target.parentElement.getAttribute("data-id");
@@ -51,19 +90,6 @@ function createElementList(doc) {
   thingsList.appendChild(li);
 }
 
-// Display List on UI
-function displayList() {
-  const db = firebase.firestore();
-  db.collection("things")
-    .orderBy("created_at", "desc")
-    .get()
-    .then((snapshot) => {
-      snapshot.docs.forEach((doc) => {
-        createElementList(doc);
-      });
-    });
-}
-displayList();
 // Get Input fields
 const getInputFieldsValues = () => {
   var taskName = document.getElementById("task").value;
@@ -106,4 +132,3 @@ const deleteList = () => {
 };
 
 deleteListButton.addEventListener("click", deleteList);
-document.body.appendChild(deleteListButton);

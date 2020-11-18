@@ -118,55 +118,84 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   return newRequire;
 })({"public/src/index.js":[function(require,module,exports) {
-// Make a list
-thingsList = document.getElementById("myList");
+var auth = firebase.auth();
+var whenSignedIn = document.getElementById("whenSignedIn");
+var whenSignedOut = document.getElementById("whenSignedOut");
+var signInBtn = document.getElementById("signInBtn");
+var signOutBtn = document.getElementById("signOutBtn");
+var userDetails = document.getElementById("userDetails");
+var provider = new firebase.auth.GoogleAuthProvider();
 
-function createElementList(doc) {
-  var li = document.createElement("LI");
-  var taskName = document.createElement("span");
-  var quantity = document.createElement("span");
-  var date = document.createElement("span");
-  var daysToDeadline = document.createElement("span");
-  var cross = document.createElement("div");
-  li.setAttribute("data-id", doc.id);
-  console.log(li.setAttribute("data-id", doc.id));
-  taskName.textContent = doc.data().taskName;
-  quantity.textContent = doc.data().quantity;
-  date.textContent = doc.data().date;
-  cross.textContent = "x"; // Calculate days to deadline
+signInBtn.onclick = function () {
+  auth.signInWithPopup(provider);
+  thingsList.style.display = "block";
+};
 
-  var today = new Date();
-  daysToDeadline.textContent = Math.floor((new Date(doc.data().date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24)); // Create text node
+signOutBtn.onclick = function () {
+  auth.signOut();
+  thingsList.style.display = "none";
+};
 
-  var formattedText = "".concat(doc.data().taskName, " => ").concat(quantity.innerHTML, " by ").concat(date.innerHTML, " ||  ").concat(daysToDeadline.innerHTML, " days remaining  ");
-  var textNode = document.createTextNode(formattedText); // Create delete button
-  // const deleteButton = document.createElement("button");
-  // deleteButton.textContent = "remove";
-  // deleteButton.onclick = () => {
-  //   li.remove();
-  //   console.log("hello");
-  // };
+auth.onAuthStateChanged(function (user) {
+  if (user) {
+    whenSignedIn.hidden = false;
+    whenSignedOut.hidden = true;
+    userDetails.innerHTML = "<h3>Hello ".concat(user.displayName, "</h3><p>User ID: ").concat(user.uid, "</p>");
+    var db = firebase.firestore();
+    deleteList();
+    db.collection("things").orderBy("created_at", "desc").get().then(function (snapshot) {
+      snapshot.docs.forEach(function (doc) {
+        _createElementList(doc);
+      });
+    }); // Make a list
 
-  cross.addEventListener("click", function (e) {
-    e.stopPropagation();
-    var id = e.target.parentElement.getAttribute("data-id");
-    db.collection("things").doc(id).delete();
-    li.remove(id);
-  }); // Add text node to list items
+    thingsList = document.getElementById("myList");
 
-  li.appendChild(textNode);
-  li.appendChild(cross); // Add list items and delete button to list
+    function _createElementList(doc) {
+      var li = document.createElement("LI");
+      var taskName = document.createElement("span");
+      var quantity = document.createElement("span");
+      var date = document.createElement("span");
+      var daysToDeadline = document.createElement("span");
+      var cross = document.createElement("div");
+      li.setAttribute("data-id", doc.id);
+      console.log(li.setAttribute("data-id", doc.id));
+      taskName.textContent = doc.data().taskName;
+      quantity.textContent = doc.data().quantity;
+      date.textContent = doc.data().date;
+      cross.textContent = "x"; // Calculate days to deadline
 
-  thingsList.appendChild(li);
-} // Display List on UI
+      var today = new Date();
+      daysToDeadline.textContent = Math.floor((new Date(doc.data().date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24)); // Create text node
 
+      var formattedText = "".concat(doc.data().taskName, " => ").concat(quantity.innerHTML, " by ").concat(date.innerHTML, " ||  ").concat(daysToDeadline.innerHTML, " days remaining  ");
+      var textNode = document.createTextNode(formattedText); // Create delete button
+      // const deleteButton = document.createElement("button");
+      // deleteButton.textContent = "remove";
+      // deleteButton.onclick = () => {
+      //   li.remove();
+      //   console.log("hello");
+      // };
 
-var db = firebase.firestore();
-db.collection("things").orderBy("created_at", "desc").get().then(function (snapshot) {
-  snapshot.docs.forEach(function (doc) {
-    createElementList(doc);
-  });
-}); // Get Input fields
+      cross.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var id = e.target.parentElement.getAttribute("data-id");
+        db.collection("things").doc(id).delete();
+        li.remove(id);
+      }); // Add text node to list items
+
+      li.appendChild(textNode);
+      li.appendChild(cross); // Add list items and delete button to list
+
+      thingsList.appendChild(li);
+    }
+  } else {
+    whenSignedIn.hidden = true;
+    whenSignedOut.hidden = false;
+    userDetails.innerHTML = "";
+  }
+}); // Display List on UI
+// Get Input fields
 
 var getInputFieldsValues = function getInputFieldsValues() {
   var taskName = document.getElementById("task").value;

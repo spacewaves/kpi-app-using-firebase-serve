@@ -124,7 +124,14 @@ var whenSignedOut = document.getElementById("whenSignedOut");
 var signInBtn = document.getElementById("signInBtn");
 var signOutBtn = document.getElementById("signOutBtn");
 var userDetails = document.getElementById("userDetails");
-var provider = new firebase.auth.GoogleAuthProvider();
+var provider = new firebase.auth.GoogleAuthProvider(); // block
+
+var deleteList = function deleteList() {
+  thingsList.remove();
+  thingsList = document.createElement("ul");
+  thingsList.id = "myList";
+  document.getElementById("root").appendChild(thingsList);
+};
 
 signInBtn.onclick = function () {
   auth.signInWithPopup(provider);
@@ -142,16 +149,15 @@ auth.onAuthStateChanged(function (user) {
     whenSignedOut.hidden = true;
     userDetails.innerHTML = "<h3>Hello ".concat(user.displayName, "</h3><p>User ID: ").concat(user.uid, "</p>");
     var db = firebase.firestore();
-    deleteList();
     db.collection("things").orderBy("created_at", "desc").get().then(function (snapshot) {
       snapshot.docs.forEach(function (doc) {
-        _createElementList(doc);
+        createElementList(doc);
       });
     }); // Make a list
 
     thingsList = document.getElementById("myList");
 
-    function _createElementList(doc) {
+    function createElementList(doc) {
       var li = document.createElement("LI");
       var taskName = document.createElement("span");
       var quantity = document.createElement("span");
@@ -189,84 +195,58 @@ auth.onAuthStateChanged(function (user) {
 
       thingsList.appendChild(li);
     }
+
+    var handleClick = function handleClick(item) {
+      var _getInputFieldsValues = getInputFieldsValues(item),
+          taskName = _getInputFieldsValues.taskName,
+          quantity = _getInputFieldsValues.quantity,
+          date = _getInputFieldsValues.date;
+
+      var db = firebase.firestore();
+      thingsList = document.getElementById("myList");
+      var thingsRef;
+      thingsRef = db.collection("things"); // add input field values to firebase
+
+      thingsRef.add({
+        taskName: taskName,
+        quantity: quantity,
+        date: date,
+        created_at: Date.now()
+      });
+      deleteList();
+      db.collection("things").get().then(function (snapshot) {
+        snapshot.docs.forEach(function (doc) {
+          createElementList(doc);
+        });
+      });
+    }; // Get Input fields
+
+
+    var getInputFieldsValues = function getInputFieldsValues() {
+      var taskName = document.getElementById("task").value;
+      var quantity = document.getElementById("quantity").value;
+      var date = document.getElementById("deadline").value;
+      return {
+        taskName: taskName,
+        quantity: quantity,
+        date: date
+      };
+    }; // add button
+
+
+    var addButton = document.getElementById("myBtn");
+    addButton.addEventListener("click", handleClick);
+    var deleteListButton = document.createElement("button");
+    deleteListButton.addEventListener("click", deleteList);
+    document.body.appendChild(deleteListButton);
   } else {
     whenSignedIn.hidden = true;
     whenSignedOut.hidden = false;
+    myBtn.hidden = true;
     userDetails.innerHTML = "";
+    console.log("hello");
   }
 }); // Display List on UI
-// Get Input fields
-
-var getInputFieldsValues = function getInputFieldsValues() {
-  var taskName = document.getElementById("task").value;
-  var quantity = document.getElementById("quantity").value;
-  var date = document.getElementById("deadline").value;
-  return {
-    taskName: taskName,
-    quantity: quantity,
-    date: date
-  };
-};
-
-var handleClick = function handleClick(item) {
-  var _getInputFieldsValues = getInputFieldsValues(item),
-      taskName = _getInputFieldsValues.taskName,
-      quantity = _getInputFieldsValues.quantity,
-      date = _getInputFieldsValues.date;
-
-  var db = firebase.firestore();
-  thingsList = document.getElementById("myList");
-  var thingsRef;
-  thingsRef = db.collection("things"); // add input field values to firebase
-
-  thingsRef.add({
-    taskName: taskName,
-    quantity: quantity,
-    date: date,
-    created_at: Date.now()
-  });
-  deleteList();
-  db.collection("things").get().then(function (snapshot) {
-    snapshot.docs.forEach(function (doc) {
-      createElementList(doc);
-    });
-  }); //  // calculate days to deadline
-  //  var today = new Date();
-  //  item.daysToDeadline = Math.floor(
-  //    (new Date(getInputFieldsValues(item).date).getTime() - today.getTime()) /
-  //      (1000 * 60 * 60 * 24)
-  //  );
-  //
-  //  // create list item with input fields values
-  //  var z = document.createElement("LI");
-  //  z.innerHTML = `${taskName} => ${quantity} by ${date} ||  ${item.daysToDeadline} days remaining `;
-  //
-  //  // create delete button and functionality
-  //  const deleteButton = document.createElement("button");
-  //  deleteButton.textContent = "remove";
-  //  deleteButton.onclick = () => z.remove();
-  //
-  //  // add list items and delete button to list
-  //
-  //  // add list items and delete button to list
-  //  thingsList.appendChild(z);
-  //  thingsList.appendChild(deleteButton);
-}; // add button
-
-
-var addButton = document.getElementById("myBtn");
-addButton.addEventListener("click", handleClick);
-var deleteListButton = document.createElement("button"); // block
-
-var deleteList = function deleteList() {
-  thingsList.remove();
-  thingsList = document.createElement("ul");
-  thingsList.id = "myList";
-  document.getElementById("root").appendChild(thingsList);
-};
-
-deleteListButton.addEventListener("click", deleteList);
-document.body.appendChild(deleteListButton);
 },{}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';

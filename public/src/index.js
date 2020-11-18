@@ -10,6 +10,14 @@ const userDetails = document.getElementById("userDetails");
 
 const provider = new firebase.auth.GoogleAuthProvider();
 
+// block
+const deleteList = () => {
+  thingsList.remove();
+  thingsList = document.createElement("ul");
+  thingsList.id = "myList";
+  document.getElementById("root").appendChild(thingsList);
+};
+
 signInBtn.onclick = () => {
   auth.signInWithPopup(provider);
   thingsList.style.display = "block";
@@ -25,7 +33,7 @@ auth.onAuthStateChanged((user) => {
     whenSignedOut.hidden = true;
     userDetails.innerHTML = `<h3>Hello ${user.displayName}</h3><p>User ID: ${user.uid}</p>`;
     const db = firebase.firestore();
-    deleteList();
+
     db.collection("things")
       .orderBy("created_at", "desc")
       .get()
@@ -86,83 +94,55 @@ auth.onAuthStateChanged((user) => {
       // Add list items and delete button to list
       thingsList.appendChild(li);
     }
+
+    const handleClick = (item) => {
+      const { taskName, quantity, date } = getInputFieldsValues(item);
+
+      const db = firebase.firestore();
+      thingsList = document.getElementById("myList");
+      let thingsRef;
+      thingsRef = db.collection("things");
+
+      // add input field values to firebase
+      thingsRef.add({
+        taskName: taskName,
+        quantity: quantity,
+        date: date,
+        created_at: Date.now(),
+      });
+      deleteList();
+      db.collection("things")
+        .get()
+        .then((snapshot) => {
+          snapshot.docs.forEach((doc) => {
+            createElementList(doc);
+          });
+        });
+    };
+    // Get Input fields
+    const getInputFieldsValues = () => {
+      var taskName = document.getElementById("task").value;
+      var quantity = document.getElementById("quantity").value;
+      var date = document.getElementById("deadline").value;
+
+      return { taskName, quantity, date };
+    };
+
+    // add button
+    const addButton = document.getElementById("myBtn");
+    addButton.addEventListener("click", handleClick);
+
+    const deleteListButton = document.createElement("button");
+
+    deleteListButton.addEventListener("click", deleteList);
+    document.body.appendChild(deleteListButton);
   } else {
     whenSignedIn.hidden = true;
     whenSignedOut.hidden = false;
+    myBtn.hidden = true;
     userDetails.innerHTML = "";
+    console.log("hello");
   }
 });
 
 // Display List on UI
-
-// Get Input fields
-const getInputFieldsValues = () => {
-  var taskName = document.getElementById("task").value;
-  var quantity = document.getElementById("quantity").value;
-  var date = document.getElementById("deadline").value;
-
-  return { taskName, quantity, date };
-};
-
-const handleClick = (item) => {
-  const { taskName, quantity, date } = getInputFieldsValues(item);
-
-  const db = firebase.firestore();
-  thingsList = document.getElementById("myList");
-  let thingsRef;
-  thingsRef = db.collection("things");
-
-  // add input field values to firebase
-  thingsRef.add({
-    taskName: taskName,
-    quantity: quantity,
-    date: date,
-    created_at: Date.now(),
-  });
-  deleteList();
-  db.collection("things")
-    .get()
-    .then((snapshot) => {
-      snapshot.docs.forEach((doc) => {
-        createElementList(doc);
-      });
-    });
-
-  //  // calculate days to deadline
-  //  var today = new Date();
-  //  item.daysToDeadline = Math.floor(
-  //    (new Date(getInputFieldsValues(item).date).getTime() - today.getTime()) /
-  //      (1000 * 60 * 60 * 24)
-  //  );
-  //
-  //  // create list item with input fields values
-  //  var z = document.createElement("LI");
-  //  z.innerHTML = `${taskName} => ${quantity} by ${date} ||  ${item.daysToDeadline} days remaining `;
-  //
-  //  // create delete button and functionality
-  //  const deleteButton = document.createElement("button");
-  //  deleteButton.textContent = "remove";
-  //  deleteButton.onclick = () => z.remove();
-  //
-  //  // add list items and delete button to list
-  //
-  //  // add list items and delete button to list
-  //  thingsList.appendChild(z);
-  //  thingsList.appendChild(deleteButton);
-};
-// add button
-const addButton = document.getElementById("myBtn");
-addButton.addEventListener("click", handleClick);
-
-const deleteListButton = document.createElement("button");
-
-// block
-const deleteList = () => {
-  thingsList.remove();
-  thingsList = document.createElement("ul");
-  thingsList.id = "myList";
-  document.getElementById("root").appendChild(thingsList);
-};
-
-deleteListButton.addEventListener("click", deleteList);
-document.body.appendChild(deleteListButton);

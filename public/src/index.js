@@ -54,6 +54,7 @@ function createElementList(doc) {
 // Display List on UI
 const db = firebase.firestore();
 db.collection("things")
+  .orderBy("created_at", "desc")
   .get()
   .then((snapshot) => {
     snapshot.docs.forEach((doc) => {
@@ -83,6 +84,7 @@ const handleClick = (item) => {
     taskName: taskName,
     quantity: quantity,
     date: date,
+    created_at: Date.now(),
   });
   deleteList();
   db.collection("things")

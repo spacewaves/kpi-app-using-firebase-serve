@@ -162,7 +162,7 @@ function createElementList(doc) {
 
 
 var db = firebase.firestore();
-db.collection("things").get().then(function (snapshot) {
+db.collection("things").orderBy("created_at", "desc").get().then(function (snapshot) {
   snapshot.docs.forEach(function (doc) {
     createElementList(doc);
   });
@@ -193,7 +193,8 @@ var handleClick = function handleClick(item) {
   thingsRef.add({
     taskName: taskName,
     quantity: quantity,
-    date: date
+    date: date,
+    created_at: Date.now()
   });
   deleteList();
   db.collection("things").get().then(function (snapshot) {
@@ -265,7 +266,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49165" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57847" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

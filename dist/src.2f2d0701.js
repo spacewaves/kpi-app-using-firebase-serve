@@ -148,6 +148,12 @@ auth.onAuthStateChanged(function (user) {
     whenSignedIn.hidden = false;
     whenSignedOut.hidden = true;
     userDetails.innerHTML = "<h3>Hello ".concat(user.displayName, "</h3><p>User ID: ").concat(user.uid, "</p>");
+    var mySelect = document.getElementById("pets");
+    console.log(mySelect);
+    newOption = document.createElement("option");
+    newOption.value = user.displayName;
+    newOption.innerText = user.displayName;
+    mySelect.prepend(newOption);
     var db = firebase.firestore();
     db.collection("things").orderBy("created_at", "desc").get().then(function (snapshot) {
       snapshot.docs.forEach(function (doc) {

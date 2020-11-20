@@ -32,6 +32,14 @@ auth.onAuthStateChanged((user) => {
     whenSignedIn.hidden = false;
     whenSignedOut.hidden = true;
     userDetails.innerHTML = `<h3>Hello ${user.displayName}</h3><p>User ID: ${user.uid}</p>`;
+
+    var mySelect = document.getElementById("pets");
+    console.log(mySelect);
+    newOption = document.createElement("option");
+    newOption.value = user.displayName;
+    newOption.innerText = user.displayName;
+    mySelect.prepend(newOption);
+
     const db = firebase.firestore();
 
     db.collection("things")

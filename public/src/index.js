@@ -33,13 +33,6 @@ auth.onAuthStateChanged((user) => {
     whenSignedOut.hidden = true;
     userDetails.innerHTML = `<h3>Hello ${user.displayName}</h3><p>User ID: ${user.uid}</p>`;
 
-    var mySelect = document.getElementById("pets");
-    console.log(mySelect);
-    newOption = document.createElement("option");
-    newOption.value = user.displayName;
-    newOption.innerText = user.displayName;
-    mySelect.prepend(newOption);
-
     const db = firebase.firestore();
 
     db.collection("things")
@@ -144,6 +137,33 @@ auth.onAuthStateChanged((user) => {
 
       return { taskName, quantity, date, owner };
     };
+    // Owner drop down menu
+    var values = [
+      user.displayName,
+      "dog",
+      "cat",
+      "Laurent",
+      "parrot",
+      "Ben",
+      "rabbit",
+    ];
+
+    var select = document.createElement("select");
+    select.name = "pets";
+    select.id = "pets";
+
+    for (const val of values) {
+      var option = document.createElement("option");
+      option.value = val;
+      option.text = val.charAt(0).toUpperCase() + val.slice(1);
+      select.appendChild(option);
+    }
+
+    var label = document.createElement("label");
+    label.innerHTML = "Owner: ";
+    label.htmlFor = "pets";
+
+    document.getElementById("owner").appendChild(label).appendChild(select);
 
     // add button
     const addButton = document.getElementById("myBtn");

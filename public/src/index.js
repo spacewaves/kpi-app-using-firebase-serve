@@ -133,7 +133,6 @@ auth.onAuthStateChanged((user) => {
       var e = document.getElementById("pets");
       var text = e.options[e.selectedIndex].text;
       var owner = text;
-      console.log(owner);
 
       return { taskName, quantity, date, owner };
     };
@@ -156,5 +155,3 @@ auth.onAuthStateChanged((user) => {
 });
 
 // Display List on UI
-
-document.getElementById("submit").onclick = function () {};

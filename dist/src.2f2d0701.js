@@ -233,7 +233,6 @@ auth.onAuthStateChanged(function (user) {
       var e = document.getElementById("pets");
       var text = e.options[e.selectedIndex].text;
       var owner = text;
-      console.log(owner);
       return {
         taskName: taskName,
         quantity: quantity,
@@ -256,8 +255,6 @@ auth.onAuthStateChanged(function (user) {
     console.log("hello");
   }
 }); // Display List on UI
-
-document.getElementById("submit").onclick = function () {};
 },{}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -286,7 +283,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65341" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49861" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

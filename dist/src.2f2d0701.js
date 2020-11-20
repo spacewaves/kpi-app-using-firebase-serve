@@ -162,6 +162,7 @@ auth.onAuthStateChanged(function (user) {
       var taskName = document.createElement("span");
       var quantity = document.createElement("span");
       var date = document.createElement("span");
+      var owner = document.createElement("span");
       var daysToDeadline = document.createElement("span");
       var cross = document.createElement("div");
       li.setAttribute("data-id", doc.id);
@@ -169,12 +170,13 @@ auth.onAuthStateChanged(function (user) {
       taskName.textContent = doc.data().taskName;
       quantity.textContent = doc.data().quantity;
       date.textContent = doc.data().date;
+      owner.textContent = doc.data().owner;
       cross.textContent = "x"; // Calculate days to deadline
 
       var today = new Date();
       daysToDeadline.textContent = Math.floor((new Date(doc.data().date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24)); // Create text node
 
-      var formattedText = "".concat(doc.data().taskName, " => ").concat(quantity.innerHTML, " by ").concat(date.innerHTML, " ||  ").concat(daysToDeadline.innerHTML, " days remaining  ");
+      var formattedText = "".concat(doc.data().taskName, " => ").concat(quantity.innerHTML, " by ").concat(date.innerHTML, " ||  ").concat(daysToDeadline.innerHTML, " days remaining - ").concat(owner.innerHTML, " ");
       var textNode = document.createTextNode(formattedText); // Create delete button
       // const deleteButton = document.createElement("button");
       // deleteButton.textContent = "remove";
@@ -200,7 +202,8 @@ auth.onAuthStateChanged(function (user) {
       var _getInputFieldsValues = getInputFieldsValues(item),
           taskName = _getInputFieldsValues.taskName,
           quantity = _getInputFieldsValues.quantity,
-          date = _getInputFieldsValues.date;
+          date = _getInputFieldsValues.date,
+          owner = _getInputFieldsValues.owner;
 
       var db = firebase.firestore();
       thingsList = document.getElementById("myList");
@@ -211,6 +214,7 @@ auth.onAuthStateChanged(function (user) {
         taskName: taskName,
         quantity: quantity,
         date: date,
+        owner: owner,
         created_at: Date.now()
       });
       deleteList();
@@ -226,10 +230,12 @@ auth.onAuthStateChanged(function (user) {
       var taskName = document.getElementById("task").value;
       var quantity = document.getElementById("quantity").value;
       var date = document.getElementById("deadline").value;
+      var owner = document.getElementById("owner").value;
       return {
         taskName: taskName,
         quantity: quantity,
-        date: date
+        date: date,
+        owner: owner
       };
     }; // add button
 
@@ -275,7 +281,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57847" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65341" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

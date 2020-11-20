@@ -230,7 +230,10 @@ auth.onAuthStateChanged(function (user) {
       var taskName = document.getElementById("task").value;
       var quantity = document.getElementById("quantity").value;
       var date = document.getElementById("deadline").value;
-      var owner = document.getElementById("owner").value;
+      var e = document.getElementById("pets");
+      var text = e.options[e.selectedIndex].text;
+      var owner = text;
+      console.log(owner);
       return {
         taskName: taskName,
         quantity: quantity,
@@ -253,6 +256,8 @@ auth.onAuthStateChanged(function (user) {
     console.log("hello");
   }
 }); // Display List on UI
+
+document.getElementById("submit").onclick = function () {};
 },{}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
